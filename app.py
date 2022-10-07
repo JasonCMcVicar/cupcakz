@@ -23,7 +23,7 @@ db.create_all()
 @app.get('/api/cupcakes')
 def list_cupcakes():
     """List all cupcakes.
-    
+
     Return: {cupcakes: [{id, flavor, size, rating, image}, ...]}
     """
     cupcake_instances = Cupcake.query.all()
@@ -33,3 +33,14 @@ def list_cupcakes():
         cupcakes.append(cupcake.serialize())
 
     return jsonify(cupcakes=cupcakes)
+
+@app.get('/api/cupcakes/<int:cupcake_id>')
+def list_cupcake(cupcake_id):
+    """List a single cupcake.
+
+    Return: {cupcake: {id, flavor, size, rating, image}}
+    """
+    cupcake_instance = Cupcake.query.get_or_404(cupcake_id)
+    cupcake_instance = cupcake_instance.serialize()
+
+    return jsonify(cupcake=cupcake_instance)
