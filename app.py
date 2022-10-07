@@ -1,7 +1,7 @@
 """Flask app for Cupcakes"""
 
-import json
-from flask import Flask, redirect, render_template, jsonify
+import re
+from flask import Flask, request, redirect, render_template, jsonify
 # from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Cupcake
@@ -44,3 +44,21 @@ def list_cupcake(cupcake_id):
     cupcake_instance = cupcake_instance.serialize()
 
     return jsonify(cupcake=cupcake_instance)
+
+@app.post('/api/cupcakes')
+def add_cupcake():
+    """Create a new cupcake with flavor, size, rating, and image.
+    
+    Return: {cupcake: {id, flavor, size, rating, image}}
+    """
+    flavor = request.json["flavor"]
+    size = request.json['size']
+    rating = request.json['rating']
+    image = request.json['image']
+    cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
+    db.session.add(cupcake)
+    db.session.commit()
+    
+    cupcake = cupcake.serialize()
+
+    return (jsonify(cupcake=cupcake), 201)
