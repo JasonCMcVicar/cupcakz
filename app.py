@@ -63,16 +63,28 @@ def add_cupcake():
 
     return (jsonify(cupcake=cupcake), 201)
 
-@app.patch('/api/cupcakes/<int:cupcake_id')
+@app.patch('/api/cupcakes/<int:cupcake_id>')
 def update_cupcake(cupcake_id):
     """Update an existing cupcake with flavor, size, rating, and/or image
 
     Return: {cupcake: {id, flavor, size, rating, image}}
     """
     cupcake_instance = Cupcake.query.get_or_404(cupcake_id)
-    # flavor = request.json.get("flavor", cupcake_instance["flavor"])
+    # flavor = request.json.get("flavor", cupcake_instance.flavor)
     flavor = request.json.get("flavor", None)
-    size = request.json.get("size", None)
-    rating = request.json.get("rating", None)
-    image = request.json("image", None)
-    cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
+    size = request.json.get("size", cupcake_instance.size)
+    rating = request.json.get("rating", cupcake_instance.rating)
+    image = request.json.get("image", cupcake_instance.image)
+
+    # cupcake_instance.flavor = flavor
+    cupcake_instance.flavor = flavor if flavor != None else cupcake_instance.flavor
+
+    cupcake_instance.size = size
+    cupcake_instance.rating = rating
+    cupcake_instance.image = image
+
+    db.session.commit()
+
+    cupcake = cupcake_instance.serialize()
+
+    return jsonify(cupcake=cupcake)
